@@ -2,7 +2,7 @@
 
 A modern web app to create events, collect RSVPs, and manage attendees—all in one place.
 
-**🌐 Demo:** [Live App on Render](https://rsvp-client.onrender.com/events)
+**🌐 Demo:** [Live App on Render](https://rsvp-client.onrender.com/)
 
 ## What is this?
 - Create and share events (workshops, meetups, etc.)
