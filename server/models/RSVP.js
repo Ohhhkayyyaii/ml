@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const rsvpSchema = new mongoose.Schema({
+  event: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Event',
+    required: [true, 'Event is required']
+  },
   name: {
     type: String,
     required: [true, 'Name is required'],
@@ -9,42 +14,25 @@ const rsvpSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, 'Email is required'],
-    trim: true,
-    lowercase: true
+    trim: true
   },
   phone: {
     type: String,
-    required: [true, 'Phone number is required'],
     trim: true
-  },
-  eventName: {
-    type: String,
-    required: [true, 'Event name is required'],
-    trim: true
-  },
-  eventDate: {
-    type: Date,
-    required: [true, 'Event date is required']
-  },
-  numberOfGuests: {
-    type: Number,
-    required: [true, 'Number of guests is required'],
-    min: 1,
-    max: 10
   },
   dietaryRestrictions: {
     type: String,
-    trim: true,
-    default: 'None'
+    trim: true
   },
   additionalNotes: {
     type: String,
     trim: true
   },
-  status: {
+  attendanceStatus: {
     type: String,
     enum: ['confirmed', 'pending', 'cancelled'],
-    default: 'pending'
+    default: 'confirmed',
+    required: true
   }
 }, {
   timestamps: true

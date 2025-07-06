@@ -10,21 +10,49 @@ const Dashboard = () => {
     cancelledRSVPs: 0,
     totalGuests: 0
   })
+  const [recentRSVPs, setRecentRSVPs] = useState([])
+  const [upcomingEvents, setUpcomingEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    fetchStats()
+    fetchDashboardData()
   }, [])
 
-  const fetchStats = async () => {
+  const fetchDashboardData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/rsvp/stats/summary')
-      setStats(response.data)
+      const [statsRes, rsvpsRes, eventsRes] = await Promise.all([
+        axios.get('http://localhost:5001/api/rsvp/stats/summary'),
+        axios.get('http://localhost:5001/api/rsvp?limit=5'),
+        axios.get('http://localhost:5001/api/events')
+      ])
+      
+      setStats(statsRes.data)
+      setRecentRSVPs(rsvpsRes.data)
+      setUpcomingEvents(eventsRes.data.filter(event => new Date(event.date) > new Date()))
     } catch (err) {
-      setError('Failed to fetch statistics')
+      setError('Failed to fetch dashboard data')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'confirmed': return 'bg-green-100 text-green-800'
+      case 'pending': return 'bg-yellow-100 text-yellow-800'
+      case 'cancelled': return 'bg-red-100 text-red-800'
+      default: return 'bg-gray-100 text-gray-800'
     }
   }
 
@@ -133,19 +161,30 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Quick Actions */}
         <div className="card">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
           <div className="space-y-3">
             <Link
-              to="/rsvp"
+              to="/events/create"
               className="flex items-center p-3 bg-primary-50 border border-primary-200 rounded-lg hover:bg-primary-100 transition-colors"
             >
               <svg className="w-5 h-5 text-primary-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              <span className="text-primary-700 font-medium">Create New RSVP</span>
+              <span className="text-primary-700 font-medium">Create New Event</span>
+            </Link>
+            
+            <Link
+              to="/rsvp"
+              className="flex items-center p-3 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+            >
+              <svg className="w-5 h-5 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-green-700 font-medium">Create New RSVP</span>
             </Link>
             
             <Link
@@ -160,15 +199,64 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* Recent RSVPs */}
         <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-          <div className="text-center py-8 text-gray-500">
-            <svg className="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            <p>No recent activity</p>
-            <p className="text-sm">Start by creating your first RSVP</p>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent RSVPs</h3>
+          {recentRSVPs.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <svg className="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <p>No recent RSVPs</p>
+              <p className="text-sm">Start by creating your first RSVP</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {recentRSVPs.slice(0, 5).map((rsvp) => (
+                <div key={rsvp._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-900">{rsvp.responses?.name || rsvp.name}</p>
+                    <p className="text-sm text-gray-500">{rsvp.event?.name || rsvp.eventName}</p>
+                  </div>
+                  <span className={`px-2 py-1 text-xs rounded-full font-medium ${getStatusColor(rsvp.status)}`}>
+                    {rsvp.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Upcoming Events */}
+        <div className="card">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Upcoming Events</h3>
+          {upcomingEvents.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <svg className="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <p>No upcoming events</p>
+              <p className="text-sm">Create your first event</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {upcomingEvents.slice(0, 5).map((event) => (
+                <div key={event._id} className="p-3 bg-blue-50 rounded-lg">
+                  <p className="font-medium text-gray-900">{event.name}</p>
+                  <p className="text-sm text-gray-500">{formatDate(event.date)}</p>
+                  {event.description && (
+                    <p className="text-sm text-gray-600 mt-1">{event.description}</p>
+                  )}
+                  <Link 
+                    to={`/rsvp/${event._id}`} 
+                    className="inline-block mt-2 text-sm text-primary-600 hover:text-primary-700 font-medium"
+                  >
+                    RSVP Now →
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

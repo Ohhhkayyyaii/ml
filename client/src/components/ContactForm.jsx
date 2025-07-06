@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 
-const RSVPForm = () => {
+const ContactForm = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
-    dietaryRestrictions: '',
-    additionalNotes: '',
-    attendanceStatus: 'confirmed'
+    subject: '',
+    message: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -17,7 +15,6 @@ const RSVPForm = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    // Enhanced validation with better error messages
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
     } else if (formData.name.trim().length < 2) {
@@ -30,8 +27,16 @@ const RSVPForm = () => {
       newErrors.email = 'Please enter a valid email address';
     }
 
-    if (formData.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/\s/g, ''))) {
-      newErrors.phone = 'Please enter a valid phone number';
+    if (!formData.subject.trim()) {
+      newErrors.subject = 'Subject is required';
+    } else if (formData.subject.trim().length < 5) {
+      newErrors.subject = 'Subject must be at least 5 characters long';
+    }
+
+    if (!formData.message.trim()) {
+      newErrors.message = 'Message is required';
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = 'Message must be at least 10 characters long';
     }
 
     setErrors(newErrors);
@@ -65,32 +70,19 @@ const RSVPForm = () => {
     setSubmitStatus(null);
 
     try {
-      const response = await fetch('http://localhost:5000/api/rsvp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+      // Simulate API call - replace with actual endpoint
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      setSubmitStatus('success');
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
       });
-
-      if (response.ok) {
-        setSubmitStatus('success');
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          dietaryRestrictions: '',
-          additionalNotes: '',
-          attendanceStatus: 'confirmed'
-        });
-      } else {
-        const errorData = await response.json();
-        setSubmitStatus('error');
-        console.error('Submission error:', errorData);
-      }
     } catch (error) {
       setSubmitStatus('error');
-      console.error('Network error:', error);
+      console.error('Submission error:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -100,13 +92,13 @@ const RSVPForm = () => {
     <div className="animate-fade-in">
       <div className="card card-hover">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex-center mx-auto mb-4 shadow-lg">
+          <div className="w-16 h-16 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl flex-center mx-auto mb-4 shadow-lg">
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
-          <h3 className="text-gradient text-2xl font-bold mb-2">RSVP Form</h3>
-          <p className="text-gray-600">Please fill out the form below to confirm your attendance</p>
+          <h3 className="text-gradient text-2xl font-bold mb-2">Contact Us</h3>
+          <p className="text-gray-600">Have questions? We'd love to hear from you!</p>
         </div>
 
         {/* Status Messages */}
@@ -116,9 +108,9 @@ const RSVPForm = () => {
               <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-              <span className="font-semibold">RSVP submitted successfully!</span>
+              <span className="font-semibold">Message sent successfully!</span>
             </div>
-            <p className="mt-2 text-sm">Thank you for confirming your attendance. We look forward to seeing you!</p>
+            <p className="mt-2 text-sm">Thank you for your message. We'll get back to you soon!</p>
           </div>
         )}
 
@@ -128,16 +120,16 @@ const RSVPForm = () => {
               <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
-              <span className="font-semibold">Submission failed</span>
+              <span className="font-semibold">Failed to send message</span>
             </div>
-            <p className="mt-2 text-sm">Please try again or contact us if the problem persists.</p>
+            <p className="mt-2 text-sm">Please try again or contact us directly.</p>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Personal Information Section */}
+          {/* Contact Information */}
           <fieldset className="fieldset-modern">
-            <legend className="legend-modern">Personal Information</legend>
+            <legend className="legend-modern">Contact Information</legend>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -190,139 +182,77 @@ const RSVPForm = () => {
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
-                Phone Number
+              <label htmlFor="subject" className="block text-sm font-semibold text-gray-700 mb-2">
+                Subject *
               </label>
               <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
+                type="text"
+                id="subject"
+                name="subject"
+                value={formData.subject}
                 onChange={handleInputChange}
-                className={`input-field ${errors.phone ? 'input-field-error' : ''}`}
-                placeholder="Enter your phone number (optional)"
+                className={`input-field ${errors.subject ? 'input-field-error' : ''}`}
+                placeholder="What is this regarding?"
+                required
               />
-              {errors.phone && (
+              {errors.subject && (
                 <p className="mt-1 text-sm text-red-600 flex items-center">
                   <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
-                  {errors.phone}
+                  {errors.subject}
                 </p>
               )}
             </div>
           </fieldset>
 
-          {/* Attendance Status Section */}
+          {/* Message Section */}
           <fieldset className="fieldset-modern">
-            <legend className="legend-modern">Attendance Status</legend>
+            <legend className="legend-modern">Your Message</legend>
             
-            <div className="space-y-4">
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  id="confirmed"
-                  name="attendanceStatus"
-                  value="confirmed"
-                  checked={formData.attendanceStatus === 'confirmed'}
-                  onChange={handleInputChange}
-                  className="form-radio"
-                />
-                <label htmlFor="confirmed" className="ml-3 text-sm font-medium text-gray-700">
-                  <span className="status-badge status-confirmed mr-2">Confirmed</span>
-                  I will attend the session
-                </label>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  id="pending"
-                  name="attendanceStatus"
-                  value="pending"
-                  checked={formData.attendanceStatus === 'pending'}
-                  onChange={handleInputChange}
-                  className="form-radio"
-                />
-                <label htmlFor="pending" className="ml-3 text-sm font-medium text-gray-700">
-                  <span className="status-badge status-pending mr-2">Pending</span>
-                  I might attend (will confirm later)
-                </label>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  id="cancelled"
-                  name="attendanceStatus"
-                  value="cancelled"
-                  checked={formData.attendanceStatus === 'cancelled'}
-                  onChange={handleInputChange}
-                  className="form-radio"
-                />
-                <label htmlFor="cancelled" className="ml-3 text-sm font-medium text-gray-700">
-                  <span className="status-badge status-cancelled mr-2">Cancelled</span>
-                  I cannot attend
-                </label>
-              </div>
+            <div>
+              <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
+                Message *
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                value={formData.message}
+                onChange={handleInputChange}
+                rows="6"
+                className={`input-field ${errors.message ? 'input-field-error' : ''}`}
+                placeholder="Tell us more about your inquiry..."
+                required
+              />
+              {errors.message && (
+                <p className="mt-1 text-sm text-red-600 flex items-center">
+                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {errors.message}
+                </p>
+              )}
             </div>
           </fieldset>
 
-          {/* Additional Information Section */}
-          <fieldset className="fieldset-modern">
-            <legend className="legend-modern">Additional Information</legend>
-            
-            <div className="space-y-6">
-              <div>
-                <label htmlFor="dietaryRestrictions" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Dietary Restrictions
-                </label>
-                <textarea
-                  id="dietaryRestrictions"
-                  name="dietaryRestrictions"
-                  value={formData.dietaryRestrictions}
-                  onChange={handleInputChange}
-                  rows="3"
-                  className="input-field"
-                  placeholder="Any dietary restrictions or preferences (optional)"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="additionalNotes" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Additional Notes
-                </label>
-                <textarea
-                  id="additionalNotes"
-                  name="additionalNotes"
-                  value={formData.additionalNotes}
-                  onChange={handleInputChange}
-                  rows="4"
-                  className="input-field"
-                  placeholder="Any additional information or special requests (optional)"
-                />
-              </div>
-            </div>
-          </fieldset>
-
-          {/* Submit Button */}
+          {/* Submit Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 pt-6">
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`btn-primary flex-1 ${isSubmitting ? 'loading' : ''}`}
+              className={`btn-success flex-1 ${isSubmitting ? 'loading' : ''}`}
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center">
                   <div className="loading-spinner mr-3"></div>
-                  Submitting...
+                  Sending...
                 </div>
               ) : (
                 <div className="flex items-center justify-center">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                   </svg>
-                  Submit RSVP
+                  Send Message
                 </div>
               )}
             </button>
@@ -333,10 +263,8 @@ const RSVPForm = () => {
                 setFormData({
                   name: '',
                   email: '',
-                  phone: '',
-                  dietaryRestrictions: '',
-                  additionalNotes: '',
-                  attendanceStatus: 'confirmed'
+                  subject: '',
+                  message: ''
                 });
                 setErrors({});
                 setSubmitStatus(null);
@@ -346,13 +274,49 @@ const RSVPForm = () => {
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-              Reset Form
+              Clear Form
             </button>
           </div>
         </form>
+
+        {/* Contact Information */}
+        <div className="mt-12 pt-8 border-t border-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex-center mx-auto mb-4 shadow-lg">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+              </div>
+              <h4 className="font-semibold text-gray-800 mb-2">Phone</h4>
+              <p className="text-gray-600">+1 (555) 123-4567</p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl flex-center mx-auto mb-4 shadow-lg">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h4 className="font-semibold text-gray-800 mb-2">Email</h4>
+              <p className="text-gray-600">info@rsvpmanager.com</p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl flex-center mx-auto mb-4 shadow-lg">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <h4 className="font-semibold text-gray-800 mb-2">Address</h4>
+              <p className="text-gray-600">123 Event Street<br />City, State 12345</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-export default RSVPForm; 
+export default ContactForm; 

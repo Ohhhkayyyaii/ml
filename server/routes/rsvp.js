@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const RSVP = require('../models/RSVP');
 
-// Get all RSVPs
+// Get all RSVPs (attendees)
 router.get('/', async (req, res) => {
   try {
     const rsvps = await RSVP.find().sort({ createdAt: -1 });
@@ -14,9 +14,8 @@ router.get('/', async (req, res) => {
 
 // Create new RSVP
 router.post('/', async (req, res) => {
-  const rsvp = new RSVP(req.body);
-  
   try {
+    const rsvp = new RSVP(req.body);
     const newRSVP = await rsvp.save();
     res.status(201).json(newRSVP);
   } catch (error) {
@@ -61,30 +60,6 @@ router.delete('/:id', async (req, res) => {
     } else {
       res.status(404).json({ message: 'RSVP not found' });
     }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Get RSVP statistics
-router.get('/stats/summary', async (req, res) => {
-  try {
-    const totalRSVPs = await RSVP.countDocuments();
-    const confirmedRSVPs = await RSVP.countDocuments({ status: 'confirmed' });
-    const pendingRSVPs = await RSVP.countDocuments({ status: 'pending' });
-    const cancelledRSVPs = await RSVP.countDocuments({ status: 'cancelled' });
-    
-    const totalGuests = await RSVP.aggregate([
-      { $group: { _id: null, total: { $sum: '$numberOfGuests' } } }
-    ]);
-    
-    res.json({
-      totalRSVPs,
-      confirmedRSVPs,
-      pendingRSVPs,
-      cancelledRSVPs,
-      totalGuests: totalGuests[0]?.total || 0
-    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
