@@ -20,9 +20,16 @@ const EventList = ({ onSelect }) => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/event`);
       const data = await res.json();
+      console.log('Fetched events data:', data);
+      if (!Array.isArray(data)) {
+        setError('Server returned invalid data for events.');
+        setEvents([]);
+        return;
+      }
       setEvents(data);
     } catch (err) {
       setError('Failed to load events');
+      setEvents([]);
     } finally {
       setLoading(false);
     }
@@ -93,7 +100,11 @@ const EventList = ({ onSelect }) => {
           </button>
         </form>
       )}
-      {error && <div className="alert-danger mb-4">{error}</div>}
+      {error && (
+        <div className="alert-danger mb-4" style={{fontSize: '1.25rem', color: 'red', textAlign: 'center', fontWeight: 'bold'}}>
+          {error}
+        </div>
+      )}
       {loading ? (
         <div className="flex-center py-8"><div className="loading-spinner"></div></div>
       ) : (

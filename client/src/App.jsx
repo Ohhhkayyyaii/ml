@@ -112,6 +112,7 @@ function App() {
           } />
           <Route path="/events" element={<EventList />} />
           <Route path="/event/:id" element={<EventPage />} />
+          <Route path="*" element={<div style={{textAlign: 'center', marginTop: '2rem'}}>Page Not Found</div>} />
         </Routes>
       </main>
     </div>
