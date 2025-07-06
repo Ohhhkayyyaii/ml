@@ -22,7 +22,8 @@ export default function DynamicRSVPForm() {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    axios.get(`http://localhost:5001/api/events/${eventId}`)
+    const API_BASE_URL = import.meta.env.VITE_API_URL;
+    axios.get(`${API_BASE_URL}/api/events/${eventId}`)
       .then(res => {
         setEvent(res.data);
         const initial = {};
@@ -42,7 +43,8 @@ export default function DynamicRSVPForm() {
     setError('');
     setSuccess('');
     try {
-      await axios.post('http://localhost:5001/api/rsvp', {
+      const API_BASE_URL = import.meta.env.VITE_API_URL;
+      await axios.post(`${API_BASE_URL}/api/rsvp`, {
         eventId,
         responses: form
       });

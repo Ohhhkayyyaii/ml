@@ -7,6 +7,8 @@ const RSVPList = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     fetchAttendees();
   }, []);
@@ -14,7 +16,7 @@ const RSVPList = () => {
   const fetchAttendees = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/rsvp');
+      const response = await fetch(`${API_BASE_URL}/api/rsvp`);
       
       if (response.ok) {
         const data = await response.json();
@@ -36,7 +38,7 @@ const RSVPList = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/rsvp/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/rsvp/${id}`, {
         method: 'DELETE',
       });
 
@@ -53,7 +55,7 @@ const RSVPList = () => {
 
   const handleStatusUpdate = async (id, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/rsvp/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/rsvp/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

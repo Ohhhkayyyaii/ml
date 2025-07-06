@@ -14,7 +14,8 @@ const AttendeeList = () => {
 
   const fetchAttendees = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/rsvp')
+      const API_BASE_URL = import.meta.env.VITE_API_URL;
+      const response = await axios.get(`${API_BASE_URL}/api/rsvp`)
       setAttendees(response.data)
     } catch (err) {
       setError('Failed to fetch attendees')
@@ -26,7 +27,8 @@ const AttendeeList = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this RSVP?')) {
       try {
-        await axios.delete(`http://localhost:5001/api/rsvp/${id}`)
+        const API_BASE_URL = import.meta.env.VITE_API_URL;
+        await axios.delete(`${API_BASE_URL}/api/rsvp/${id}`)
         fetchAttendees()
       } catch (err) {
         alert('Failed to delete RSVP')

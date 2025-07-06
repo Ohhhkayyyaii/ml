@@ -19,6 +19,8 @@ const EventPage = () => {
   const [formErrors, setFormErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     fetchEvent();
     fetchAttendees();
@@ -28,7 +30,7 @@ const EventPage = () => {
   const fetchEvent = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:5000/api/event/${id}`);
+      const res = await fetch(`${API_BASE_URL}/api/event/${id}`);
       if (!res.ok) throw new Error('Event not found');
       const data = await res.json();
       setEvent(data);
@@ -42,7 +44,7 @@ const EventPage = () => {
   const fetchAttendees = async () => {
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:5000/api/rsvp');
+      const res = await fetch(`${API_BASE_URL}/api/rsvp`);
       if (!res.ok) throw new Error('Failed to fetch attendees');
       const data = await res.json();
       setAttendees(data.filter(a => a.event === id));
@@ -74,7 +76,7 @@ const EventPage = () => {
     setSubmitting(true);
     setFormStatus(null);
     try {
-      const res = await fetch('http://localhost:5000/api/rsvp', {
+      const res = await fetch(`${API_BASE_URL}/api/rsvp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, event: id }),

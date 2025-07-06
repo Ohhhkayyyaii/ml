@@ -9,6 +9,8 @@ const EventList = ({ onSelect }) => {
   const [form, setForm] = useState({ name: '', date: '', description: '' });
   const [creating, setCreating] = useState(false);
 
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     fetchEvents();
   }, []);
@@ -16,7 +18,7 @@ const EventList = ({ onSelect }) => {
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/event');
+      const res = await fetch(`${API_BASE_URL}/api/event`);
       const data = await res.json();
       setEvents(data);
     } catch (err) {
@@ -35,7 +37,7 @@ const EventList = ({ onSelect }) => {
     setCreating(true);
     setError(null);
     try {
-      const res = await fetch('http://localhost:5000/api/event', {
+      const res = await fetch(`${API_BASE_URL}/api/event`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),

@@ -11,7 +11,8 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/event')
+    const API_BASE_URL = import.meta.env.VITE_API_URL;
+    fetch(`${API_BASE_URL}/api/event`)
       .then(res => res.json())
       .then(data => {
         setEvents(data);

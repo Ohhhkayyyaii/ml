@@ -21,10 +21,11 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
+      const API_BASE_URL = import.meta.env.VITE_API_URL;
       const [statsRes, rsvpsRes, eventsRes] = await Promise.all([
-        axios.get('http://localhost:5001/api/rsvp/stats/summary'),
-        axios.get('http://localhost:5001/api/rsvp?limit=5'),
-        axios.get('http://localhost:5001/api/events')
+        axios.get(`${API_BASE_URL}/api/rsvp/stats/summary`),
+        axios.get(`${API_BASE_URL}/api/rsvp?limit=5`),
+        axios.get(`${API_BASE_URL}/api/events`)
       ])
       
       setStats(statsRes.data)

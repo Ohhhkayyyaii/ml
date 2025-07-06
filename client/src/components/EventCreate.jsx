@@ -41,7 +41,8 @@ export default function EventCreate() {
     setSuccess('');
     setError('');
     try {
-      await axios.post('http://localhost:5001/api/events', form);
+      const API_BASE_URL = import.meta.env.VITE_API_URL;
+      await axios.post(`${API_BASE_URL}/api/events`, form);
       setSuccess('Event created successfully!');
       setForm({ name: '', date: '', description: '', fields: ['name', 'email'] });
     } catch (err) {
